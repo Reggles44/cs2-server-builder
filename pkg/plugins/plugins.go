@@ -1,15 +1,16 @@
 package plugins
 
 type PluginType interface {
-	Versions() []Version
+	Name() string
+	String() string
+	Versions() ([]Version, error)
 	Download(version string)
 	Extract()
-	String() string
 }
 
 type Plugin struct {
 	Name         string
-	Dependencies []*Plugin
+	Dependencies []PluginType
 }
 
 type Version struct {

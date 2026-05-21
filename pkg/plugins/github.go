@@ -13,6 +13,14 @@ type GithubPlugin struct {
 	RepoAuthor string
 }
 
+func (p GithubPlugin) Name() string {
+	return p.Plugin.Name
+}
+
+func (p GithubPlugin) String() string { 
+	return fmt.Sprintf("%s (by %s)", p.RepoName, p.RepoAuthor)
+}
+
 type githubReleases struct {
 	URL        string `json:"url"`
 	ID         int    `json:"id"`
@@ -24,7 +32,7 @@ type githubReleases struct {
 	ZipBallUrl string `json:"zipball_url"`
 }
 
-func (p *GithubPlugin) Version() ([]Version, error) {
+func (p GithubPlugin) Versions() ([]Version, error) {
 	versions := []Version{}
 
 	resp, err := http.Get(fmt.Sprintf("https://api.github.com/repos/%s/%s/releases", p.RepoAuthor, p.RepoName))
@@ -55,3 +63,7 @@ func (p *GithubPlugin) Version() ([]Version, error) {
 
 	return versions, nil
 }
+
+
+func (p GithubPlugin) Download(version string) {} 
+func (p GithubPlugin) Extract() {} 
