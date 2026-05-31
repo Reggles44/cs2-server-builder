@@ -2,6 +2,7 @@ package lock
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -17,28 +18,23 @@ type PluginLock struct {
 	Version *plugins.Version `json:"version"`
 }
 
-func getPluginPath() (string, error) {
+var path = getLockFilePath()
+
+func getLockFilePath() string {
 	dir, err := os.Getwd()
 	if err != nil {
-		return "", err
+		log.Panic(err)
 	}
 
-	return filepath.Join(dir, "Plugins"), nil
+	return filepath.Join(dir, "Plugins")
 }
-
-func 
 
 func ReadLock() (*Lock, error) {
 	var lock Lock
 
-	path, err := getPluginPath()
-	if err != nil {
-		return &lock, err
-	}
-
 	dat, err := os.ReadFile(path)
 	if err != nil {
-		return &lock, err
+		return nil, err
 	}
 
 	err = json.Unmarshal(dat, &lock)
@@ -50,11 +46,6 @@ func ReadLock() (*Lock, error) {
 }
 
 func (l *Lock) WriteLock() error {
-	path, err := getPluginPath()
-	if err != nil {
-		return err
-	}
-
 	dat, err := json.Marshal(l)
 	if err != nil {
 		return err
