@@ -9,12 +9,11 @@ import (
 	"github.com/reggles44/cs2-server-builder/pkg/plugins"
 )
 
-type Lock struct {
-	Plugins []PluginLock `json:"plugins"`
-}
+type Lock map[string]*PluginLock
 
 type PluginLock struct {
 	Repo    string           `json:"repo"`
+	Author  string           `json:"author"`
 	Version *plugins.Version `json:"version"`
 }
 
@@ -26,33 +25,49 @@ func getLockFilePath() string {
 		log.Panic(err)
 	}
 
-	return filepath.Join(dir, "Plugins")
+	return filepath.Join(dir, "Plugins.json")
 }
 
-func ReadLock() (*Lock, error) {
-	var lock Lock
+func ReadLock() *Lock {
+	lock := make(Lock)
 
 	dat, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return &lock
 	}
 
 	err = json.Unmarshal(dat, &lock)
 	if err != nil {
-		return &lock, err
+		log.Panic(err)
 	}
 
-	return &lock, nil
+	return &lock
 }
 
 func (l *Lock) WriteLock() error {
-	dat, err := json.Marshal(l)
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, dat, os.ModePerm)
+	defer file.Close()
+
+	dat, err := json.MarshalIndent(l, "", "    ")
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(dat)
+	return err
 }
 
-func (l *Lock) AddPlugin(plugin plugins.PluginType, version *plugins.Version) {
-	l.Plugins = append(l.Plugins, PluginLock{plugin.Key(), version})
+func (l Lock) AddPlugin(plugin *plugins.Plugin, version *plugins.Version) {
+	l[plugin.Key()] = &PluginLock{
+		Repo:    plugin.Repo,
+		Author:  plugin.Author,
+		Version: version,
+	}
+}
+
+func (l Lock) RemovePlugin(plugin *plugins.Plugin) {
+	delete(l, plugin.Key())
 }

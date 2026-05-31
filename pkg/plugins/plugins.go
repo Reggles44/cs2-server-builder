@@ -1,15 +1,9 @@
 package plugins
 
-import "fmt"
-
-type PluginType interface {
-	String() string
-	Key() string
-	Match(arg string) bool
-	Versions() VersionSlice
-	Download(version string)
-	Extract()
-}
+import (
+	"fmt"
+	"strings"
+)
 
 type Plugin struct {
 	Repo     string
@@ -22,13 +16,13 @@ func (p *Plugin) String() string {
 }
 func (p *Plugin) Key() string             { return p.Repo }
 func (p *Plugin) Versions() VersionSlice  { return p.versions }
-func (p *Plugin) Match(arg string) bool   { return arg == p.Repo }
+func (p *Plugin) Match(arg string) bool   { return strings.EqualFold(arg, p.Repo) }
 func (p *Plugin) Download(version string) {}
 func (p *Plugin) Extract()                {}
 
 var Plugins = parsePlugin()
 
-func FindPlugin(arg string) (PluginType, error) {
+func FindPlugin(arg string) (*Plugin, error) {
 	for _, plug := range Plugins {
 		if plug.Match(arg) {
 			return plug, nil

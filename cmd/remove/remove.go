@@ -1,6 +1,12 @@
 package remove
 
-import "github.com/spf13/cobra"
+import (
+	"log"
+
+	"github.com/reggles44/cs2-server-builder/pkg/lock"
+	"github.com/reggles44/cs2-server-builder/pkg/plugins"
+	"github.com/spf13/cobra"
+)
 
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
@@ -8,7 +14,18 @@ func NewCommand() *cobra.Command {
 		Short:   "Remove a plugin",
 		Example: "remove sharptimer",
 		Run: func(cmd *cobra.Command, args []string) {
-			panic("TODO")
+			l := lock.ReadLock()
+
+			for _, s := range args {
+				plugin, err := plugins.FindPlugin(s)
+				if err != nil {
+					log.Fatal(err)
+				} else {
+					l.RemovePlugin(plugin)
+				}
+			}
+
+			l.WriteLock()
 		},
 	}
 

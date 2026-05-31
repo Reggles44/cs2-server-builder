@@ -15,14 +15,14 @@ type pluginData struct {
 	Versions []*Version `json:"releases"`
 }
 
-func parsePlugin() []PluginType {
+func parsePlugin() []*Plugin {
 	var raw []*pluginData
 	err := json.Unmarshal(pluginsData, &raw)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	var plugins []PluginType
+	var plugins []*Plugin
 
 	for _, p := range raw {
 		parts := strings.Split(p.Repo, "/")
