@@ -13,9 +13,8 @@ type Lock struct {
 }
 
 type PluginLock struct {
-	Name    string `json:"name"`
-	Repo    string `json:"repo"`
-	Version string `json:"version"`
+	Repo    string           `json:"repo"`
+	Version *plugins.Version `json:"version"`
 }
 
 func getPluginPath() (string, error) {
@@ -26,6 +25,8 @@ func getPluginPath() (string, error) {
 
 	return filepath.Join(dir, "Plugins"), nil
 }
+
+func 
 
 func ReadLock() (*Lock, error) {
 	var lock Lock
@@ -58,15 +59,9 @@ func (l *Lock) WriteLock() error {
 	if err != nil {
 		return err
 	}
-
 	return os.WriteFile(path, dat, os.ModePerm)
 }
 
-func (l *Lock) AddPlugin(plugin plugins.Plugin, version string) {
-	l.Plugins = append(l.Plugins, PluginLock{plugin.Name, plugin.Repo, version})
-}
-
-func (pl *PluginLock) GetPlugin() (*plugins.Plugin, bool) {
-	p, ok := plugins.Map[pl.Name]
-	return p, ok
+func (l *Lock) AddPlugin(plugin plugins.PluginType, version *plugins.Version) {
+	l.Plugins = append(l.Plugins, PluginLock{plugin.Key(), version})
 }

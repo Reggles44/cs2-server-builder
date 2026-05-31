@@ -14,7 +14,7 @@ func NewCommand() *cobra.Command {
 		Long:    "List plugins, their respective repos, and available versions",
 		Example: "list",
 		Run: func(cmd *cobra.Command, args []string) {
-			for _, plugin := range plugins.Map {
+			for _, plugin := range plugins.Plugins {
 				fmt.Println(plugin.String())
 			}
 		},

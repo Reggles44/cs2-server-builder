@@ -1,6 +1,7 @@
 package add
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -23,11 +24,12 @@ func NewCommand() *cobra.Command {
 			}
 
 			for _, s := range args {
-				plugin := plugins.FindPlugin(s)
-				if plugin != nil {
-					l.AddPlugin(plugin plugins.Plugin, )
+				fmt.Println(s)
+				plugin, err := plugins.FindPlugin(s)
+				if err != nil {
+					log.Fatal(err)
 				} else {
-					fmt.Println("%s is not a valid plugin", s)
+					l.AddPlugin(plugin, plugin.Versions().Latest())
 				}
 			}
 		},
